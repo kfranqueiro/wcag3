@@ -1,4 +1,5 @@
 import { defineConfig } from "astro/config";
+import node from "@astrojs/node";
 // TODO: dynamically import cheerio only when needed,
 // when https://github.com/withastro/astro/issues/12689 is resolved
 import { load } from "cheerio";
@@ -12,8 +13,18 @@ import { fileURLToPath } from "url";
 
 import { guidelinesRehypePlugins, guidelinesRemarkPlugins } from "./src/lib/markdown/guidelines";
 
+const GH_REPO = process.env.GITHUB_REPOSITORY; // Only set during GitHub action
+
 // https://astro.build/config
 export default defineConfig({
+  adapter: node({
+    mode: "standalone",
+  }),
+  base: `${GH_REPO ? GH_REPO.slice(GH_REPO.indexOf("/")) : ""}/`,
+  // Run in server mode in local dev only, for editing UI.
+  // astro dev ensures NODE_ENV is set to development;
+  // DEV/PROD env vars are not set yet when config is loaded
+  output: process.env.NODE_ENV === "development" ? "server" : "static",
   trailingSlash: "always",
   markdown: {
     remarkPlugins: [remarkDirective, remarkDefinitionList, ...guidelinesRemarkPlugins],
