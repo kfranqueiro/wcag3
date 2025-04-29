@@ -1,0 +1,7 @@
+name: Validate specs for PR
+on: pull_request
+
+jobs:
+  spec-prod:
+    uses: ./.github/workflows/spec-prod.yml
+    secrets: inherit

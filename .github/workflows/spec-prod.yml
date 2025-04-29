@@ -1,0 +1,100 @@
+# Reusable workflow for running spec-prod for validation or publishing
+
+name: spec-prod
+on:
+  workflow_call:
+    inputs:
+      pages:
+        description: 'Whether to push to GitHub Pages'
+        default: false
+        required: false
+        type: boolean
+
+# Allow this job to clone the repo and create a Pages deployment
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout git repository
+        uses: actions/checkout@v4
+      - name: Install node
+        uses: actions/setup-node@v4
+        with:
+          cache: npm
+          node-version-file: .nvmrc
+      - name: Install and build
+        run: |
+          npm ci
+          npm run build
+      - name: Build and copy how-tos
+        run: |
+          cd how-to
+          npm ci
+          npm run build:gh-pages
+          cp -r _site ../dist/client/how-to
+      - name: Upload interim artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: dist/client
+          retention-days: 1
+
+  spec-prod:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dirname:
+          - guidelines
+          - explainer
+          - requirements
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: build-output
+      - uses: w3c/spec-prod@v2
+        with:
+          SOURCE: ${{ matrix.dirname }}/index.html
+          TOOLCHAIN: respec
+          ARTIFACT_NAME: spec-prod-result-${{ matrix.dirname }}
+
+  combine:
+    needs: spec-prod
+    if: ${{ inputs.pages }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: build-output
+      - uses: actions/download-artifact@v4
+        with:
+          name: spec-prod-result-guidelines
+          path: guidelines
+      - uses: actions/download-artifact@v4
+        with:
+          name: spec-prod-result-explainer
+          path: explainer
+      - uses: actions/download-artifact@v4
+        with:
+          name: spec-prod-result-requirements
+          path: requirements
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+  
+  pages:
+    needs: combine
+    if: ${{ inputs.pages }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
