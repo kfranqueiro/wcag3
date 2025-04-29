@@ -48,12 +48,6 @@ a.internalDFN[title]:hover, .internalDFN[title]:active, a.internalDFN[title]:foc
 	font-size: 100%;
 	color: #005A9C;
 }
-.guideline-text, .outcome-text {
-	font-size: 110%;
-	margin-top: 0;
-	margin-bottom: 0;
-	text-indent: 50px;
-}
 .guideline h3, .outcome h4 {
 	width: 100%;
 	margin-bottom: 0;
