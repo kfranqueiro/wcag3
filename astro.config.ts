@@ -11,21 +11,45 @@ import { readFile, writeFile } from "fs/promises";
 import { basename, dirname, join } from "path";
 import { fileURLToPath } from "url";
 
+import { isDevOrPreview } from "./src/lib/constants";
+import { commonRehypePlugins, commonRemarkPlugins } from "./src/lib/markdown/common";
 import { guidelinesRehypePlugins, guidelinesRemarkPlugins } from "./src/lib/markdown/guidelines";
+import { howtoRehypePlugins, howtoRemarkPlugins } from "./src/lib/markdown/how-to";
 
 const GH_REPO = process.env.GITHUB_REPOSITORY; // Only set during GitHub action
+
+function resolveBase() {
+  if (GH_REPO) return `${GH_REPO.slice(GH_REPO.indexOf("/"))}/`;
+  if (isDevOrPreview) return "/";
+  return "/WAI/WCAG3/";
+}
+
+function resolveSite() {
+  if (GH_REPO) return "https://w3c.github.io";
+  if (import.meta.env.REVIEW_ID)
+    return `https://deploy-preview-${import.meta.env.REVIEW_ID}--wcag3.netlify.app`;
+  if (import.meta.env.DEV) return "http://localhost:4321";
+  return "https://w3.org";
+}
 
 // https://astro.build/config
 export default defineConfig({
   adapter: node({
     mode: "standalone",
   }),
-  base: `${GH_REPO ? GH_REPO.slice(GH_REPO.indexOf("/")) : ""}/`,
+  base: resolveBase(),
+  site: resolveSite(),
   devToolbar: { enabled: false },
   trailingSlash: "always",
   markdown: {
-    remarkPlugins: [remarkDirective, remarkDefinitionList, ...guidelinesRemarkPlugins],
-    rehypePlugins: [...guidelinesRehypePlugins],
+    remarkPlugins: [
+      remarkDirective,
+      remarkDefinitionList,
+      ...guidelinesRemarkPlugins,
+      ...howtoRemarkPlugins,
+      ...commonRemarkPlugins,
+    ],
+    rehypePlugins: [...guidelinesRehypePlugins, ...howtoRehypePlugins, ...commonRehypePlugins],
     remarkRehype: {
       // https://github.com/wataru-chocola/remark-definition-list/issues/50#issuecomment-1445130314
       handlers: { ...defListHastHandlers },
