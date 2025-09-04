@@ -4,6 +4,7 @@ import { load } from "cheerio";
 
 import { informativeSlug } from "@/lib/constants";
 import { computeGuidelineTitle } from "@/lib/guidelines";
+import { silenceWarnings } from "@/lib/informative";
 
 interface Props {
   entry: CollectionEntry<"guidelines"> | CollectionEntry<"requirements">;
@@ -13,8 +14,8 @@ const { entry } = Astro.props;
 
 const howtoEntry =
   entry.collection === "guidelines"
-    ? await getEntry("howtoGuidelines", entry.id)
-    : await getEntry("howtoRequirements", entry.id);
+    ? await silenceWarnings(() => getEntry("howtoGuidelines", entry.id))
+    : await silenceWarnings(() => getEntry("howtoRequirements", entry.id));
 
 function processHtml() {
   if (!entry.rendered) {
@@ -36,7 +37,7 @@ function processHtml() {
   $wrappableElement.wrap(`<div class="body-wrapper"></div>`).after(`
     <aside class="doclinks">
       <p>
-        <a href="${import.meta.env.BASE_URL}${informativeSlug}${howtoEntry.id.slice(howtoEntry.id.indexOf("/"))}">
+        <a href="${import.meta.env.BASE_URL}${informativeSlug}/${howtoEntry.id}/">
           <svg aria-hidden="true" class="i-info">
             <use xlink:href="img/icons.svg#i-info" />
           </svg>

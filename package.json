@@ -17,9 +17,11 @@
     "astro": "^5.9.4",
     "cheerio": "^1.0.0",
     "fast-glob": "^3.3.3",
+    "github-slugger": "^2.0.0",
     "hast-util-to-html": "^9.0.4",
     "lodash-es": "^4.17.21",
     "patch-package": "^8.0.0",
+    "pluralize": "^8.0.0",
     "remark-definition-list": "^2.0.0",
     "remark-directive": "^3.0.1",
     "unist-util-visit": "^5.0.0",
@@ -30,6 +32,7 @@
     "@types/hast": "^3.0.4",
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^20.17.14",
+    "@types/pluralize": "^0.0.33",
     "typescript": "^5.8.2"
   }
 }

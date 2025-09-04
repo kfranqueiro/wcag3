@@ -1,4 +1,4 @@
-import type { RemarkPlugin } from "@astrojs/markdown-remark";
+import { rehypeHeadingIds, type RehypePlugin, type RemarkPlugin } from "@astrojs/markdown-remark";
 
 import { isHowtoFile } from "./common";
 
@@ -19,5 +19,12 @@ const customDirectives: RemarkPlugin = () => (tree, file) => {
   }
 };
 
+const headingIds: RehypePlugin = () => (tree, file) => {
+  if (!isHowtoFile(file)) return;
+
+  // @ts-ignore(2554) - rehypeHeadingIds' typings require 3rd param, but it's unused
+  rehypeHeadingIds({ experimentalHeadingIdCompat: true })!(tree, file);
+};
+
 export const howtoRemarkPlugins = [customDirectives];
-export const howtoRehypePlugins = [];
+export const howtoRehypePlugins = [headingIds];
