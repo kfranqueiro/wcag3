@@ -1,7 +1,6 @@
 ---
 import GithubSlugger from "github-slugger";
 
-import Breadcrumbs from "@/components/how-to/Breadcrumbs.astro";
 import GuidelineSummary from "@/components/how-to/GuidelineSummary.astro";
 import HowtoLayout from "@/layouts/HowtoLayout.astro";
 import {
@@ -19,8 +18,7 @@ for (const { id } of informativeGroups) {
 const slugger = new GithubSlugger();
 ---
 
-<HowtoLayout title="All WCAG 3 Guidelines">
-  <Breadcrumbs slot="breadcrumbs" segments={[]} />
+<HowtoLayout title="All WCAG 3 Guidelines" breadcrumbSegments={[]}>
   {
     informativeGroups.map((group) => (
       <>

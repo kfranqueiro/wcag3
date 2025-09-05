@@ -81,7 +81,6 @@ export const collections = {
   }),
 
   // Content for informative WCAG 3 docs
-  // TODO: further define schemas
 
   howtoGuidelines: defineCollection({
     loader: glob({ pattern: "*/*.md", base: "./how-to-meet" }),

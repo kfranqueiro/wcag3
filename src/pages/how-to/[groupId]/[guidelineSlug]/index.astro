@@ -3,6 +3,7 @@ import type { GetStaticPaths, GetStaticPathsResult } from "astro";
 
 import HowtoLayout from "@/layouts/HowtoLayout.astro";
 import {
+  formatNormativeContent,
   processKeyTerms,
   resolveInformativeGroups,
   resolveInformativeGuideline,
@@ -11,7 +12,6 @@ import {
 import { load } from "cheerio";
 import KeyTerms from "@/components/how-to/KeyTerms.astro";
 import { render } from "astro:content";
-import Breadcrumbs from "@/components/how-to/Breadcrumbs.astro";
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const paths: GetStaticPathsResult = [];
@@ -32,24 +32,14 @@ const { groupId, guidelineSlug } = Astro.params;
 const guidelineId = `${groupId}/${guidelineSlug}`;
 
 const guideline = await resolveInformativeGuideline(guidelineId);
-if (!guideline) throw new Error(`Unresolvable guideline ID: ${guidelineId}`);
+if (!guideline) throw new Error(`Unresolvable informative guideline ID: ${guidelineId}`);
 if (!guideline.rendered || !guideline.normativeEntry.rendered) {
   throw new Error(
     `how-to/[group]/[guideline]: Rendered HTML missing for ${guideline.id}; check for Markdown parse failures earlier in log`
   );
 }
 
-const normativeHtml = `
-  <h2 id="normative-text">Normative Text</h2>
-  <div class="normative">${guideline.normativeEntry.rendered.html}</div>
-`;
-
-const normative$ = load(normativeHtml, null, false);
-normative$("summary").each((_, el) => {
-  const $el = normative$(el);
-  // Add child element to summaries to work with WAI excol styles
-  if ($el.text() === $el.html()) $el.html(`<strong>${$el.text()}</strong>`);
-});
+const normativeHtml = formatNormativeContent(guideline.normativeEntry.rendered);
 
 const { headings } = await render(guideline);
 const h2Slugs = headings.filter(({ depth }) => depth === 2).map(({ slug }) => slug);
@@ -59,30 +49,18 @@ const beforeSlug = goalIndex > -1 ? h2Slugs[goalIndex + 1] : h2Slugs[0];
 const { html, terms } = (() => {
   if (beforeSlug) {
     const $ = load(guideline.rendered.html, null, false);
-    $(`#${beforeSlug}`).before(normative$.html());
+    $(`#${beforeSlug}`).before(normativeHtml);
     return processKeyTerms($.html());
   }
-  return processKeyTerms(normative$.html() + guideline.rendered.html);
+  return processKeyTerms(normativeHtml + guideline.rendered.html);
 })();
 ---
 
-<HowtoLayout title={guideline.title}>
-  <Breadcrumbs slot="breadcrumbs" segments={[guideline]} />
+<HowtoLayout
+  title={guideline.title}
+  breadcrumbSegments={[guideline]}
+  nav={{ current: guideline, guideline }}
+>
   <Fragment set:html={html} />
   <KeyTerms terms={terms} />
 </HowtoLayout>
-
-<style is:global>
-  .normative {
-    border: solid 1px var(--cloudy-subtle);
-    margin-top: 1em;
-    padding: 0.5em 1em;
-    border-left-width: 1em;
-  }
-
-  .decision-tree summary {
-    /* Override WAI styles */
-    margin-left: 0;
-    margin-right: 0;
-  }
-</style>
