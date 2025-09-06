@@ -34,11 +34,19 @@ const { breadcrumbSegments, nav, title } = Astro.props;
     {breadcrumbSegments && <Breadcrumbs segments={breadcrumbSegments} />}
     <div class="default-grid with-gap leftcol">
       {nav && <SideNav {...nav} />}
-      <main
-        id="main"
-        class={nav ? "" : "standalone-resource__main"}
-        tabindex="-1"
-      >
+      <main id="main" class={nav ? "" : "standalone-resource__main"} tabindex="-1">
+        {
+          nav && (
+            <aside class="box page-contents">
+              <header class="box-h">Page Contents</header>
+              <div class="box-i">
+                <nav class="navtoc" aria-label="Page Contents">
+                  <ul>{/* Contents added in middleware.ts */}</ul>
+                </nav>
+              </div>
+            </aside>
+          )
+        }
         <h1>{title || "How to Meet WCAG 3"}</h1>
         <slot />
       </main>
@@ -131,5 +139,26 @@ const { breadcrumbSegments, nav, title } = Astro.props;
     position: absolute;
     white-space: nowrap;
     width: 1px;
+  }
+
+  .page-contents {
+    font-size: 0.85em;
+    margin: 0 0 1em;
+  }
+  .page-contents ul {
+    list-style: none;
+    margin: 0;
+    padding-inline-start: 0;
+  }
+  .page-contents li:not(:first-child) {
+    padding-top: 0.8em;
+    line-height: 1.2;
+    border-top: 1px solid #bcbcbc;
+  }
+  .page-contents li a {
+    text-decoration: none;
+  }
+  .page-contents li a:hover {
+    text-decoration: underline;
   }
 </style>
