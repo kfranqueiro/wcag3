@@ -39,7 +39,7 @@
 - Jon Avila (Level Access)
 - Jory Cunningham (Amazon)
 - Julie Rawe (Understood)
-- Ken Franqueiro (W3C)
+- Kenneth G. Franqueiro (W3C)
 - Kimberly McGee (SAP SE)
 - Laura Carlson (Invited Expert)
 - Len Beasley (CVS Pharmacy, Inc.)

@@ -25,5 +25,5 @@ Examples include:
 - personification
 - puns
 - sarcasm
-- similes
+- similies
 :::
