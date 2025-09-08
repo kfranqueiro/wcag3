@@ -12,8 +12,8 @@ export const isGuidelineFile = (file: VFile) =>
   file.dirname?.startsWith(`${file.cwd}/${groupsPath}`);
 export const isTermFile = (file: VFile) => file.dirname?.startsWith(`${file.cwd}/guidelines/terms`);
 
-const howtoPath = `${informativeSlug}-meet`; // TODO: remove after removing 11ty prototype
-export const isHowtoFile = (file: VFile) => file.dirname?.startsWith(`${file.cwd}/${howtoPath}`);
+export const isHowtoFile = (file: VFile) =>
+  file.dirname?.startsWith(`${file.cwd}/${informativeSlug}`);
 
 /** Determines type of normative content file based on directory depth */
 export function getGuidelineFileType(file: VFile) {
@@ -29,7 +29,7 @@ export function getGuidelineFileType(file: VFile) {
 /** Determines type of informative content file based on directory depth */
 export function getHowtoFileType(file: VFile) {
   if (!isHowtoFile(file)) return null;
-  const remainingPath = file.dirname!.replace(`${file.cwd}/${howtoPath}/`, "");
+  const remainingPath = file.dirname!.replace(`${file.cwd}/${informativeSlug}/`, "");
   const segments = remainingPath?.split("/");
   if (segments.length === 0) return "guideline";
   if (segments.length === 1) return "requirement";

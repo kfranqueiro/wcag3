@@ -83,11 +83,11 @@ export const collections = {
   // Content for informative WCAG 3 docs
 
   howtoGuidelines: defineCollection({
-    loader: glob({ pattern: "*/*.md", base: "./how-to-meet" }),
+    loader: glob({ pattern: "*/*.md", base: "./how-to" }),
     schema: z.strictObject({}),
   }),
   howtoRequirements: defineCollection({
-    loader: glob({ pattern: "*/*/*.md", base: "./how-to-meet" }),
+    loader: glob({ pattern: "*/*/*.md", base: "./how-to" }),
     schema: z.strictObject({}),
   }),
 };
