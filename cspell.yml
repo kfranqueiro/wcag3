@@ -7,41 +7,52 @@ dictionaries:
   - softwareTerms
   - css
   - html
+  - custom
+dictionaryDefinitions:
+  - name: custom
+    path: custom-words.txt
+    addWords: true
 ignorePaths: 
   - "guidelines/acknowledgements/**"
+  - "how-to/**"
   - "patches/**"
   - "src/components/**"
   - "*.css"
+  - "*.json"
+  - "*.svg"
   - "*.ts"
+  - "custom-words.txt"
+useGitignore: true
+overrides:
+  - filename: "guidelines/**"
+    flagWords: [contains] # Prefer "includes" over "contains" in guidelines
+patterns:
+  # Define patterns here to be reusable across multiple file types below
+  - name: encoded-citations
+    pattern: /\[\[[^\]]+\]\]/g
+  - name: foreign-language
+    pattern: /<(\w+)[^>]+lang="(?!en)\w+"[^>]*>.*?<\/\1>/gi
 languageSettings:
-  - languageId: markdown
-    patterns:
-      - name: Block_Directive
-        pattern: /^\s*:::.*/gm
-      - name: Fenced_Code_Block
-        pattern: |
-          /
-            ^(\s*`{3,}).*     # Opening ```
-            [\s\S]*?          # the block of code
-            ^\1               # Closing ```
-          /gmx
+  - languageId: astro
     ignoreRegExpList:
-      - Block_Directive
-      - Fenced_Code_Block
-words:
-  - AGWG
-  - ATAG
-  - CIE
-  - COGA
-  - NOAA
-  - UAAG
-  - UCS
-  - WCAG
-  - mouseup
-  - numeronym
-  - numeronyms
-  - Respec
-  - Société
-  - strobing
-flagWords:
-  - contains
+      - encoded-citations
+      - foreign-language
+      # pre/code tags
+      - /<(pre|code)\b[^>]*>[\s\S]*?</\1>/g
+      # HTML tags
+      - /<[^>]*>/g
+  - languageId: markdown
+    ignoreRegExpList:
+      - encoded-citations
+      - foreign-language
+      # Block directive
+      - /^\s*:::.*/gm
+      # Fenced code block
+      - |
+        /
+          ^(\s*```).*  # Opening ```
+          [\s\S]*?     # Code block
+          ^```         # Closing ```
+        /gmx
+      # Inline code
+      - /`[^`\n]+`/g
